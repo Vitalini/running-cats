@@ -2,9 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="description" content="Running Cats - A multiplayer 2D game where players control cats and race against each other">
     <title>Running Cats Race</title>
+    <!-- Google Fonts - Roboto -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
     <!-- Favicon -->
     <link rel="icon" href="/assets/favicon.ico" type="image/x-icon">
@@ -34,7 +38,7 @@
         <div id="game-screen" style="display: none;">
             <div id="game-info">
                 <div id="player-info">
-                    <h2>Your Cat: <span id="player-value">0</span></h2>
+                    <h2 class="cat-number">Cat <span id="player-value">0</span></h2>
                     <h3>Score: <span id="player-score">0</span></h3>
                 </div>
                 
@@ -43,23 +47,33 @@
                     <div id="leaderboard-entries"></div>
                 </div>
                 
-                <div id="controls-info">
-                    <h3>Controls</h3>
-                    <p>Use arrow keys or WASD to move your cat</p>
-                    <p>Press SPACE to activate cat invulnerability</p>
-                    <p>Catch smaller cats to grow stronger</p>
-                    <p>Avoid bigger cats or they'll catch you!</p>
+                <!-- Значок клавиатуры для открытия инструкций -->
+                <div id="keyboard-icon">
+                    <button id="show-controls" aria-label="Show controls">⌨️</button>
                 </div>
             </div>
             
             <canvas id="game-canvas"></canvas>
+            
+            <!-- Mobile Controls -->
+            <div id="mobile-controls" class="hidden">
+                <div class="d-pad">
+                    <button id="up-btn" class="control-btn">↑</button>
+                    <div class="middle-row">
+                        <button id="left-btn" class="control-btn">←</button>
+                        <button id="right-btn" class="control-btn">→</button>
+                    </div>
+                    <button id="down-btn" class="control-btn">↓</button>
+                </div>
+                <button id="action-btn" class="control-btn hidden">POWER</button>
+            </div>
         </div>
     </div>
     
     <!-- Footer -->
     <footer>
         <p>&copy; 2025 Running Cats Game. All rights reserved.</p>
-        <p>Created with ❤️ by Vitalini</p>
+        <p>Created with ❤️ by <a href="http://github.com/vitalini" target="_blank">Vitalini</a></p>
     </footer>
     
     <!-- Socket.IO client library with CDN fallback -->
@@ -73,6 +87,51 @@
             document.head.appendChild(script);
         }
     </script>
+    
+    <!-- Всплывающее окно с инструкциями -->
+    <div id="controls-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3>Controls</h3>
+            <div class="controls-grid">
+                <div class="control-item">
+                    <div class="key-group">
+                        <div class="key">W</div>
+                        <div class="key-row">
+                            <div class="key">A</div>
+                            <div class="key">S</div>
+                            <div class="key">D</div>
+                        </div>
+                    </div>
+                    <div class="control-desc">Movement</div>
+                </div>
+                <div class="control-item">
+                    <div class="key-group">
+                        <div class="key">↑</div>
+                        <div class="key-row">
+                            <div class="key">←</div>
+                            <div class="key">↓</div>
+                            <div class="key">→</div>
+                        </div>
+                    </div>
+                    <div class="control-desc">Movement</div>
+                </div>
+                <div class="control-item">
+                    <div class="key long-key">Space</div>
+                    <div class="control-desc">Activate Invulnerability</div>
+                </div>
+            </div>
+            <div class="game-tips">
+                <h4>Tips:</h4>
+                <ul>
+                    <li>Catch cats with lower numbers to earn points</li>
+                    <li>Avoid cats with higher numbers</li>
+                    <li>Hide behind islands to change your number</li>
+                    <li>After eating 3 cats, you'll get invulnerability ability</li>
+                </ul>
+            </div>
+        </div>
+    </div>
     
     <!-- Game Scripts -->
     <script type="module" src="/js/game.js"></script>

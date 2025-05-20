@@ -3,7 +3,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
@@ -205,6 +205,13 @@ body {
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
 }
 
+.cat-number {
+    font-family: 'Roboto', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
 #player-value, #player-score {
     display: inline-block;
     transition: all 0.3s ease;
@@ -248,15 +255,30 @@ body {
     gap: 8px;
 }
 
+.leaderboard {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 200px;
+  background-color: rgba(0, 0, 0, 0.7);
+  border-radius: 5px;
+  padding: 10px;
+  color: white;
+  font-family: 'Arial', sans-serif;
+  z-index: 10; /* Чтобы был поверх островков */
+}
+
 .leaderboard-entry {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 12px;
+    padding: 6px 8px; /* Уменьшенные отступы */
     background: rgba(52, 73, 94, 0.7);
-    border-radius: 8px;
+    border-radius: 6px; /* Уменьшенный радиус */
     transition: all 0.2s ease;
-    border-left: 3px solid transparent;
+    border-left: 2px solid transparent; /* Уменьшенная граница */
+    margin-bottom: 4px; /* Добавляем небольшой отступ снизу */
+    font-size: 0.85rem; /* Уменьшенный размер шрифта */
 }
 
 .leaderboard-entry:hover {
@@ -272,7 +294,8 @@ body {
 .rank {
     font-weight: bold;
     color: #FF4E50;
-    width: 30px;
+    width: 25px; /* Уменьшенная ширина */
+    font-size: 0.85rem; /* Уменьшенный размер шрифта */
 }
 
 .name {
@@ -280,12 +303,163 @@ body {
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
-    padding: 0 10px;
+    padding: 0 6px; /* Уменьшенный отступ */
+    font-size: 0.85rem; /* Уменьшенный размер шрифта */
 }
 
 .score {
     font-weight: bold;
     color: #F9D423;
+    font-size: 0.85rem; /* Уменьшенный размер шрифта */
+}
+
+/* Стили для значка клавиатуры */
+#keyboard-icon {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+#show-controls {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    background-color: rgba(52, 73, 94, 0.7);
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+#show-controls:hover {
+    transform: scale(1.1);
+    background-color: rgba(52, 73, 94, 0.9);
+}
+
+/* Стили для модального окна */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.7);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.modal.show {
+    display: block;
+    opacity: 1;
+}
+
+.modal-content {
+    background-color: #2c3e50;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 10px;
+    width: 80%;
+    max-width: 500px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    color: white;
+    position: relative;
+    transform: translateY(-50px);
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.modal.show .modal-content {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.close-modal {
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.close-modal:hover {
+    color: #FF4E50;
+}
+
+/* Стили для клавиш */
+.controls-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    margin: 20px 0;
+}
+
+.control-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 10px;
+}
+
+.key-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.key-row {
+    display: flex;
+}
+
+.key {
+    width: 40px;
+    height: 40px;
+    background-color: #34495e;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 2px;
+    box-shadow: 0 3px 0 #2c3e50;
+    font-weight: bold;
+}
+
+.long-key {
+    width: 120px;
+    height: 40px;
+    background-color: #34495e;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 2px;
+    box-shadow: 0 3px 0 #2c3e50;
+    font-weight: bold;
+}
+
+.control-desc {
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.game-tips {
+    margin-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    padding-top: 15px;
+}
+
+.game-tips ul {
+    padding-left: 20px;
+    margin-top: 10px;
+}
+
+.game-tips li {
+    margin-bottom: 5px;
+    font-size: 0.9rem;
 }
 
 #controls-info {
@@ -331,4 +505,183 @@ body {
 #game-canvas {
     flex-grow: 1;
     background-color: #ecf0f1;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Островки */
+.island {
+    position: absolute;
+    background-color: #8B4513; /* Коричневый цвет для островков */
+    border-radius: 50%;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    z-index: 5;
+}
+
+/* Добавляем растительность на островки */
+.island::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 10px;
+    background-color: #2E8B57; /* Зеленый цвет для растительности */
+    border-radius: 50% 50% 0 0;
+}
+
+/* Number change timer */
+.value-change-timer {
+    display: block;
+    margin-top: 10px;
+    background-color: rgba(41, 128, 185, 0.9);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 16px;
+    text-align: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 10px rgba(41, 128, 185, 0.8);
+    font-weight: bold;
+    z-index: 100;
+    position: relative;
+}
+
+.value-change-timer .time {
+    font-weight: bold;
+    color: #FFEB3B;
+    margin: 0 5px;
+    font-size: 18px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.value-change-timer.urgent {
+    background-color: rgba(231, 76, 60, 0.9);
+    transform: scale(1.1);
+    animation: pulse 0.5s infinite alternate;
+    box-shadow: 0 0 15px rgba(231, 76, 60, 0.8);
+}
+
+@keyframes pulse {
+    from { transform: scale(1); }
+    to { transform: scale(1.1); }
+}
+
+/* Mobile Controls */
+#mobile-controls {
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px;
+    z-index: 10;
+}
+
+#mobile-controls.hidden,
+.control-btn.hidden {
+    display: none;
+}
+
+.d-pad {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.middle-row {
+    display: flex;
+    gap: 15px;
+}
+
+.control-btn {
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    color: white;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    touch-action: manipulation;
+}
+
+#action-btn {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 78, 80, 0.6);
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.control-btn:active {
+    background: rgba(255, 255, 255, 0.4);
+    transform: scale(0.95);
+}
+
+#action-btn:active {
+    background: rgba(255, 78, 80, 0.8);
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    #game-container {
+        width: 100%;
+        height: 100vh;
+        margin: 0;
+        border-radius: 0;
+    }
+    
+    #game-info {
+        width: 200px;
+        padding: 1rem;
+    }
+    
+    #player-info h2, #player-info h3,
+    #leaderboard h2, #controls-info h3 {
+        font-size: 1rem;
+    }
+    
+    #controls-info p {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 768px) {
+    #game-screen {
+        flex-direction: column;
+    }
+    
+    #game-info {
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        overflow-x: auto;
+    }
+    
+    #player-info, #leaderboard, #controls-info {
+        min-width: 200px;
+        margin: 0 10px;
+    }
+    
+    #controls-info {
+        display: none; /* Hide controls info on mobile, as we have touch controls */
+    }
+}
+
+@media (max-width: 480px) {
+    .form-group {
+        width: 90%;
+    }
+    
+    #login-screen h1 {
+        font-size: 2rem;
+    }
 }

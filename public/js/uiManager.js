@@ -6,6 +6,30 @@
 class UIManager {
   constructor(elements) {
     this.elements = elements;
+    this.valueChangeTimerElement = null;
+    
+    // Create element for displaying the timer
+    this.createValueChangeTimer();
+  }
+  
+  /**
+   * Creates a timer element for number change countdown
+   */
+  createValueChangeTimer() {
+    // Create timer element
+    this.valueChangeTimerElement = document.createElement('div');
+    this.valueChangeTimerElement.className = 'value-change-timer';
+    this.valueChangeTimerElement.innerHTML = '<span>Number changes in: </span><span class="time">15</span><span> sec</span>';
+    
+    // Add to player info block below the score
+    if (this.elements.playerScore && this.elements.playerScore.parentNode) {
+      const playerInfoBlock = this.elements.playerScore.parentNode;
+      // Add after the score block
+      playerInfoBlock.appendChild(this.valueChangeTimerElement);
+    } else if (this.elements.gameScreen) {
+      // If we couldn't find the score block, add to game screen
+      this.elements.gameScreen.appendChild(this.valueChangeTimerElement);
+    }
   }
   
   /**
@@ -31,8 +55,9 @@ class UIManager {
   updatePlayerInfo(player) {
     if (!player) return;
     
-    // Update player value
+    // Update player value - show the actual number
     if (this.elements.playerValue) {
+      // Show the actual cat number
       this.elements.playerValue.textContent = player.value;
       
       // Visual feedback when value changes
@@ -123,6 +148,35 @@ class UIManager {
   }
   
   /**
+   * Updates the timer for cat number change
+   * @param {Number} timeRemaining - Remaining time in seconds
+   * @param {Boolean} isHidden - Whether the player is hidden behind an island
+   */
+  updateValueChangeTimer(timeRemaining, isHidden) {
+    if (!this.valueChangeTimerElement) return;
+    
+    // Only show the timer if the player is hidden behind an island
+    if (isHidden) {
+      this.valueChangeTimerElement.style.display = 'block';
+      
+      const timeElement = this.valueChangeTimerElement.querySelector('.time');
+      if (timeElement) {
+        timeElement.textContent = timeRemaining;
+        
+        // Add visual effect when time is running low
+        if (timeRemaining <= 3) {
+          this.valueChangeTimerElement.classList.add('urgent');
+        } else {
+          this.valueChangeTimerElement.classList.remove('urgent');
+        }
+      }
+    } else {
+      // Скрываем таймер, если игрок не под островком
+      this.valueChangeTimerElement.style.display = 'none';
+    }
+  }
+  
+  /**
    * Update leaderboard display
    * @param {Array} leaderboard - Sorted array of players
    */
@@ -149,10 +203,10 @@ class UIManager {
       name.textContent = player.name;
       entry.appendChild(name);
       
-      // Add score
+      // Add score (без отображения номера игрока)
       const score = document.createElement('span');
       score.className = 'score';
-      score.textContent = player.score;
+      score.textContent = player.score; // Отображаем только очки
       entry.appendChild(score);
       
       // Highlight current player

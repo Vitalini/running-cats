@@ -9,9 +9,94 @@ class Game {
     this.height = height;
     this.players = new Map();
     this.leaderboard = [];
+    this.lastValueChangeTime = Date.now();
+    this.valueChangeInterval = 8000; // 8 seconds until number change
     
-    // Set up survival points timer
-    setInterval(() => this.awardSurvivalPoints(), 15000);
+    // Create islands for checking if a player is on them
+    this.islands = this.createIslands();
+    
+    // Track which players are on islands
+    this.playersOnIslands = new Map();
+    
+    // Periodic check for granting invulnerability ability (without awarding points)
+    setInterval(() => {
+      this.checkForInvulnerabilitySkill();
+    }, 60000); // Check every minute
+    
+    // Timer for updating the number change timer
+    setInterval(() => {
+      // Only reset the timer for players who have been continuously on an island
+      this.players.forEach((player, playerId) => {
+        if (!this.playersOnIslands.has(playerId)) {
+          // Player is not on an island, no timer needed
+          return;
+        }
+        
+        // Check if player is still on an island
+        if (this.isPlayerInIsland(player)) {
+          // If the timer has expired, change the player's number
+          const now = Date.now();
+          const playerIslandData = this.playersOnIslands.get(playerId);
+          
+          // Make sure we have valid data
+          if (!playerIslandData || !playerIslandData.enteredTime) {
+            console.log(`Fixing missing timer data for player ${playerId}`);
+            this.playersOnIslands.set(playerId, {
+              enteredTime: now,
+              isOnIsland: true
+            });
+            return; // Skip this player and exit the function
+          }
+          
+          const elapsed = now - playerIslandData.enteredTime;
+          
+          if (elapsed >= this.valueChangeInterval) {
+            // Change the player's number
+            console.log(`Changing number for player ${playerId}`);
+            player.value = this.generateRandomValue();
+            // Reset the timer for this player
+            this.playersOnIslands.set(playerId, {
+              enteredTime: now,
+              isOnIsland: true
+            });
+          }
+        } else {
+          // Player has left the island, remove from tracking
+          this.playersOnIslands.delete(playerId);
+        }
+      });
+    }, 1000); // Check every second
+  }
+  
+  // Creates islands for server-side checking
+  createIslands() {
+    const islands = [];
+    const numIslands = Math.floor(Math.random() * 5) + 8; // 8-12 islands
+    
+    for (let i = 0; i < numIslands; i++) {
+      const size = Math.floor(Math.random() * 20) + 20; // 20-40px
+      const x = Math.floor(Math.random() * (this.width - size * 2)) + size;
+      const y = Math.floor(Math.random() * (this.height - size * 2)) + size;
+      
+      // Check that islands don't overlap
+      let overlapping = false;
+      for (const island of islands) {
+        const dx = x - island.x;
+        const dy = y - island.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance < size + island.size + 15) {
+          overlapping = true;
+          break;
+        }
+      }
+      
+      if (!overlapping) {
+        islands.push({ x, y, size });
+      }
+    }
+    
+    return islands;
   }
 
   // Add a new player to the game
@@ -39,7 +124,8 @@ class Game {
       movingUp: false, // Movement state flags
       movingDown: false,
       movingLeft: false,
-      movingRight: false
+      movingRight: false,
+      recentlyRespawned: true // Флаг недавнего перерождения
     };
     
     this.players.set(id, player);
@@ -194,14 +280,44 @@ class Game {
       player.y = 0;
     }
     
+    // Check if player is on an island and track entry/exit
+    const isOnIsland = this.isPlayerInIsland(player);
+    const wasOnIsland = this.playersOnIslands.has(id);
+    
+    // If player just entered an island
+    if (isOnIsland && !wasOnIsland) {
+      // Start tracking this player on an island
+      const now = Date.now();
+      console.log(`Player ${id} entered island at ${now}`);
+      this.playersOnIslands.set(id, {
+        enteredTime: now,
+        isOnIsland: true
+      });
+    } 
+    // If player just left an island
+    else if (!isOnIsland && wasOnIsland) {
+      // Remove player from island tracking
+      console.log(`Player ${id} left island`);
+      this.playersOnIslands.delete(id);
+    }
+    // If player is still on an island, make sure the timer data exists
+    else if (isOnIsland && wasOnIsland) {
+      const data = this.playersOnIslands.get(id);
+      if (!data || !data.enteredTime) {
+        console.log(`Fixing timer data for player ${id}`);
+        this.playersOnIslands.set(id, {
+          enteredTime: Date.now(),
+          isOnIsland: true
+        });
+      }
+    }
+    
     this.checkCollisions(player);
     return player;
   }
 
   // Check for collisions with other players
   checkCollisions(player) {
-    if (player.isInvulnerable) return; // Skip collision checks if invulnerable
-    
     this.players.forEach((otherPlayer) => {
       // Skip self-collision
       if (otherPlayer.id === player.id) return;
@@ -216,11 +332,17 @@ class Game {
       
       if (distance < player.size) {
         // Collision detected
-        if (player.value > otherPlayer.value) {
-          // Current player eats the other player
+        if (player.isInvulnerable) {
+          // Invulnerable player always eats other players
+          this.eatPlayer(player, otherPlayer);
+        } else if (otherPlayer.isInvulnerable) {
+          // Other player is invulnerable, so they eat the current player
+          this.eatPlayer(otherPlayer, player);
+        } else if (player.value > otherPlayer.value) {
+          // Current player eats the other player (normal case)
           this.eatPlayer(player, otherPlayer);
         } else if (player.value < otherPlayer.value) {
-          // Other player eats the current player
+          // Other player eats the current player (normal case)
           this.eatPlayer(otherPlayer, player);
         }
         // If values are equal, nothing happens
@@ -230,8 +352,16 @@ class Game {
 
   // Handle one player eating another
   eatPlayer(eater, eaten) {
-    // Award points to the eater
-    eater.score += Math.max(10, Math.floor(eaten.value / 2));
+    // Проверяем, находится ли игрок в островке
+    const isEaterInIsland = this.isPlayerInIsland(eater);
+    
+    // Начисляем очки только если игрок не в островке
+    if (!isEaterInIsland) {
+      // Award points to the eater
+      eater.score += Math.max(10, Math.floor(eaten.value / 2));
+    }
+    
+    // Увеличиваем счетчик съеденных игроков в любом случае
     eater.eatenCount++;
     
     // Award invulnerability skill after eating 3 players without dying
@@ -249,26 +379,21 @@ class Game {
     eaten.value = this.generateRandomValue();
     eaten.eatenCount = 0; // Reset eaten count
     eaten.hasInvulnerability = false; // Remove invulnerability skill
+    eaten.recentlyRespawned = true; // Устанавливаем флаг недавнего перерождения
     
     // Update leaderboard
     this.updateLeaderboard();
   }
 
-  // Award survival points to all players
-  awardSurvivalPoints() {
+  // Проверка для выдачи способности неуязвимости (без начисления очков)
+  checkForInvulnerabilitySkill() {
     const now = Date.now();
     this.players.forEach((player) => {
-      // Award 5 points for every 15 seconds of survival
-      player.score += 5;
-      
-      // Every minute, give a random player the invulnerability skill
-      if (now - player.lastJoined > 60000 && Math.random() < 0.1 && !player.hasInvulnerability && !player.isInvulnerable) {
+      // Каждую минуту даем шанс получить способность неуязвимости
+      if (now - player.lastJoined > 60000 && Math.random() < 0.15 && !player.hasInvulnerability && !player.isInvulnerable) {
         player.hasInvulnerability = true;
       }
     });
-    
-    // Update leaderboard
-    this.updateLeaderboard();
   }
 
   // Update the leaderboard
@@ -278,11 +403,70 @@ class Game {
     this.leaderboard = playersArray.sort((a, b) => b.score - a.score);
   }
 
+  // Get remaining time until cat number change for a specific player
+  getTimeUntilValueChange(playerId) {
+    // If player is not on an island, return 0 (no timer)
+    if (!this.playersOnIslands.has(playerId)) {
+      return 0;
+    }
+    
+    // Get the time when the player entered the island
+    const now = Date.now();
+    const playerIslandData = this.playersOnIslands.get(playerId);
+    
+    // Make sure we have valid data
+    if (!playerIslandData || !playerIslandData.enteredTime) {
+      // Reset the timer for this player with current time
+      this.playersOnIslands.set(playerId, {
+        enteredTime: now,
+        isOnIsland: true
+      });
+      return 8; // Return full timer duration in seconds
+    }
+    
+    const elapsed = now - playerIslandData.enteredTime;
+    const remaining = Math.max(0, this.valueChangeInterval - elapsed);
+    
+    return Math.ceil(remaining / 1000); // Return in seconds
+  }
+  
+  // Check if a player is on an island
+  isPlayerInIsland(player) {
+    // Check each island
+    for (const island of this.islands || []) {
+      // Calculate the closest point on the cat to the island center
+      const closestX = Math.max(player.x, Math.min(island.x, player.x + player.size));
+      const closestY = Math.max(player.y, Math.min(island.y, player.y + player.size));
+      
+      // Calculate distance from this closest point to the island center
+      const dx = closestX - island.x;
+      const dy = closestY - island.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      
+      // If any part of the cat touches the island (more sensitive detection)
+      if (distance < island.size * 1.1) { // Increased detection radius by 10%
+        return true;
+      }
+    }
+    
+    return false;
+  }
+  
   // Get the current game state
   getState() {
+    // Create player states with individual timers
+    const playerStates = Array.from(this.players.entries()).map(([playerId, player]) => {
+      // Add player-specific timer information
+      return {
+        ...player,
+        timeUntilValueChange: this.getTimeUntilValueChange(playerId),
+        isOnIsland: this.playersOnIslands.has(playerId)
+      };
+    });
+    
     return {
-      players: Array.from(this.players.values()),
-      leaderboard: this.leaderboard.slice(0, 10) // Top 10 players
+      players: playerStates,
+      leaderboard: this.leaderboard
     };
   }
 }

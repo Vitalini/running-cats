@@ -12,8 +12,12 @@ A fun multiplayer 2D game where players control cats and race against each other
 - **Multiplayer Racing**: Compete with other players in real-time
 - **Cat Characters**: Control cute, square-shaped cats with unique colors
 - **Power-ups**: Gain invulnerability and super speed
+- **Strategic Islands**: Hide behind islands to change your cat's number
+- **Dynamic Number System**: Your cat's number changes after hiding for 8 seconds
+- **Visual Indicators**: Special effects for super speed and invulnerability
 - **Leaderboard**: See who's winning in real-time
 - **Responsive Controls**: Smooth movement with arrow keys or WASD
+- **Mobile Support**: Play on your phone or tablet with touch controls
 
 ## 🚀 Quick Start
 
@@ -26,7 +30,7 @@ A fun multiplayer 2D game where players control cats and race against each other
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/running-cats.git
+   git clone https://github.com/vitalini/running-cats.git
    cd running-cats
    ```
 
@@ -53,8 +57,12 @@ A fun multiplayer 2D game where players control cats and race against each other
 2. Use arrow keys or WASD to move your cat
 3. Try to catch cats smaller than yours (with lower numbers)
 4. Avoid cats larger than yours (with higher numbers)
-5. Press SPACE to activate invulnerability (when available)
-6. Compete for the highest score on the leaderboard
+5. Hide behind islands to change your cat's number after 8 seconds
+6. Press SPACE to activate invulnerability (when available)
+7. Eat 3 cats to earn the invulnerability ability
+8. The timer only appears when you're hiding behind an island
+9. Leaving an island resets the timer when you return
+10. Compete for the highest score on the leaderboard
 
 ## 🏗️ Project Structure
 

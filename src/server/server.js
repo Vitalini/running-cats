@@ -46,6 +46,19 @@ io.on('connection', (socket) => {
     }
   });
   
+  // Обработка изменения номера кота при укрытии под островком
+  socket.on('changeValue', ({ playerId }) => {
+    // Получаем игрока
+    const player = game.players.get(playerId);
+    if (player) {
+      // Меняем номер кота
+      player.value = game.generateRandomValue();
+      
+      // Отправляем обновленное состояние игры
+      io.emit('gameState', game.getState());
+    }
+  });
+  
   // Handle disconnection
   socket.on('disconnect', () => {
     console.log('Client disconnected:', socket.id);
