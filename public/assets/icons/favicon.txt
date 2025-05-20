@@ -1,0 +1,6 @@
+This is a placeholder for the favicon.ico file.
+
+To add a real favicon:
+1. Create a 16x16 or 32x32 pixel icon image of a cat
+2. Save it as "favicon.ico" in this directory
+3. Replace this text file with the ICO image

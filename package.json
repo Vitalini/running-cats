@@ -1,0 +1,35 @@
+{
+  "name": "running-cats",
+  "version": "1.0.0",
+  "description": "2D multiplayer game where players control cats and race against each other",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js",
+    "dev": "node --watch main.js",
+    "build": "npm run copy-assets",
+    "copy-assets": "mkdir -p public/css public/js public/assets && cp -r src/css/* public/css/ && cp -r src/js/* public/js/ && cp -r src/assets/* public/assets/ 2>/dev/null || true"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.7.2",
+    "cors": "^2.8.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/running-cats.git"
+  },
+  "keywords": [
+    "game",
+    "multiplayer",
+    "cats",
+    "racing",
+    "socket.io",
+    "canvas",
+    "html5"
+  ],
+  "author": "Vitalini",
+  "license": "MIT"
+}

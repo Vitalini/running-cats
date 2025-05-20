@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: running-cats
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 20.0.0
+      - key: PORT
+        value: 3000
+    healthCheckPath: /
+    autoDeploy: true
+    plan: free

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Running Cats - A multiplayer 2D game where players control cats and race against each other">
+    <title>Running Cats Race</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- Favicon -->
+    <link rel="icon" href="/assets/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <div id="game-container">
+        <!-- Login Screen -->
+        <div id="login-screen">
+            <h1>🐱 Running Cats Race 🐱</h1>
+            <div class="form-group">
+                <label for="player-name">Enter Your Name:</label>
+                <input type="text" id="player-name" maxlength="15" placeholder="Your name">
+                <button id="start-game">Start Game</button>
+            </div>
+            <div class="game-info">
+                <h2>Game Instructions</h2>
+                <ul>
+                    <li>Control your cat with arrow keys or WASD</li>
+                    <li>Catch smaller cats to grow stronger</li>
+                    <li>Avoid bigger cats or they'll catch you!</li>
+                    <li>Press SPACE to activate invulnerability (when available)</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Game Screen -->
+        <div id="game-screen" style="display: none;">
+            <div id="game-info">
+                <div id="player-info">
+                    <h2>Your Cat: <span id="player-value">0</span></h2>
+                    <h3>Score: <span id="player-score">0</span></h3>
+                </div>
+                
+                <div id="leaderboard">
+                    <h2>Leaderboard</h2>
+                    <div id="leaderboard-entries"></div>
+                </div>
+                
+                <div id="controls-info">
+                    <h3>Controls</h3>
+                    <p>Use arrow keys or WASD to move your cat</p>
+                    <p>Press SPACE to activate cat invulnerability</p>
+                    <p>Catch smaller cats to grow stronger</p>
+                    <p>Avoid bigger cats or they'll catch you!</p>
+                </div>
+            </div>
+            
+            <canvas id="game-canvas"></canvas>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 Running Cats Game. All rights reserved.</p>
+        <p>Created with ❤️ by Vitalini</p>
+    </footer>
+    
+    <!-- Socket.IO client library with CDN fallback -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        // If Socket.IO fails to load from the server, load it from CDN
+        if (typeof io === 'undefined') {
+            console.log('Loading Socket.IO from CDN');
+            const script = document.createElement('script');
+            script.src = 'https://cdn.socket.io/4.7.2/socket.io.min.js';
+            document.head.appendChild(script);
+        }
+    </script>
+    
+    <!-- Game Scripts -->
+    <script type="module" src="/js/game.js"></script>
+</body>
+</html>
