@@ -352,16 +352,16 @@ class Game {
 
   // Handle one player eating another
   eatPlayer(eater, eaten) {
-    // Проверяем, находится ли игрок в островке
+    // Check if the eater is on an island
     const isEaterInIsland = this.isPlayerInIsland(eater);
     
-    // Начисляем очки только если игрок не в островке
+    // Award points only if the eater is not on an island
     if (!isEaterInIsland) {
       // Award points to the eater
       eater.score += Math.max(10, Math.floor(eaten.value / 2));
     }
     
-    // Увеличиваем счетчик съеденных игроков в любом случае
+    // Increment eaten count in any case
     eater.eatenCount++;
     
     // Award invulnerability skill after eating 3 players without dying
@@ -372,6 +372,10 @@ class Game {
     
     // Give super speed to the eater
     eater.superSpeedUntil = Date.now() + 5000; // 5 seconds of super speed
+    
+    // Change the eater's number after eating another player
+    console.log(`Player ${eater.id} ate player ${eaten.id} - changing number`);
+    eater.value = this.generateRandomValue();
     
     // Reset the eaten player
     eaten.x = Math.floor(Math.random() * (this.width - 30));
@@ -466,7 +470,8 @@ class Game {
     
     return {
       players: playerStates,
-      leaderboard: this.leaderboard
+      leaderboard: this.leaderboard,
+      islands: this.islands // Include island data for all clients
     };
   }
 }

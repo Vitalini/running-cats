@@ -77,11 +77,24 @@ class UIManager {
       }
     }
     
-    // Update invulnerability status
-    if (player.hasInvulnerability) {
+    // Update invulnerability status and notification
+    const invulnerabilityNotification = document.getElementById('invulnerability-notification');
+    
+    if (player.hasInvulnerability && !player.isInvulnerable) {
+      // Player has invulnerability skill but hasn't activated it yet
       document.body.classList.add('has-invulnerability');
+      
+      // Show the notification
+      if (invulnerabilityNotification) {
+        invulnerabilityNotification.classList.remove('hidden');
+      }
     } else {
       document.body.classList.remove('has-invulnerability');
+      
+      // Hide the notification
+      if (invulnerabilityNotification) {
+        invulnerabilityNotification.classList.add('hidden');
+      }
     }
     
     // Update active invulnerability status

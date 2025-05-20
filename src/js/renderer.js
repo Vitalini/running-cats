@@ -14,9 +14,8 @@ class Renderer {
     this.canvas.width = this.width;
     this.canvas.height = this.height;
     
-    // Create islands
+    // Islands will be provided by the server
     this.islands = [];
-    this.createIslands();
   }
   
   /**
@@ -128,7 +127,15 @@ class Renderer {
   renderGame(gameState, currentPlayerId) {
     this.clear();
     
-    // Сначала рисуем игроков, которые не скрыты
+    // Update islands from server if available
+    if (gameState.islands && Array.isArray(gameState.islands)) {
+      this.islands = gameState.islands;
+    }
+    
+    // We'll draw islands after players to ensure they appear on top
+    // This ensures proper layering for hiding effect
+    
+    // First draw players that are not hidden
     gameState.players.forEach(player => {
       const isCurrentPlayer = player.id === currentPlayerId;
       const hasSuperSpeed = player.maxSpeed > 10;
@@ -269,14 +276,34 @@ class Renderer {
       this.ctx.stroke();
     }
     
-    // Убираем круг для доступной неуязвимости, вместо этого добавляем значок
+    // Draw invulnerability skill indicator when available but not active
     if (hasInvulnerabilitySkill && !isInvulnerable) {
-      // Добавляем маленький значок щита в углу
-      this.ctx.fillStyle = '#00FFFF'; // Cyan
-      this.ctx.font = `${size / 3}px Arial`;
+      // Draw a shield icon in the corner
+      this.ctx.fillStyle = '#00FFFF'; // Cyan base color
+      
+      // Add a glowing effect
+      this.ctx.shadowColor = '#00FFFF';
+      this.ctx.shadowBlur = 10;
+      
+      // Draw shield background
+      this.ctx.beginPath();
+      this.ctx.arc(x + size - size/4, y + size/4, size/5, 0, Math.PI * 2);
+      this.ctx.fill();
+      
+      // Draw shield icon
+      this.ctx.fillStyle = '#FFFFFF';
+      this.ctx.font = `bold ${size / 3}px Arial`;
       this.ctx.textAlign = 'center';
       this.ctx.textBaseline = 'middle';
-      this.ctx.fillText('⚡', x + size - size/4, y + size/4); // Значок молнии
+      this.ctx.fillText('🛡️', x + size - size/4, y + size/4); // Shield emoji
+      
+      // Add pulsing animation to draw attention
+      const pulseScale = 1 + Math.sin(Date.now() / 300) * 0.2;
+      this.ctx.font = `bold ${size / 3 * pulseScale}px Arial`;
+      this.ctx.fillText('🛡️', x + size - size/4, y + size/4);
+      
+      // Reset shadow
+      this.ctx.shadowBlur = 0;
     }
     
     // Add hiding indicator if the cat is on an island
